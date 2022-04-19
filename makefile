@@ -1,4 +1,4 @@
 main:
 	uvicorn main:app --reload
-source:
-	source venv/bin/activate
+env:
+	./venv/bin/activate
