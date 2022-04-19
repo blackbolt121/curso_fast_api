@@ -14,7 +14,10 @@ class Person(BaseModel):
     age: int
     hair_color: Optional[str] = None
     is_single: Optional[bool] = None
-
+class Location(BaseModel):
+    city: str
+    state: str
+    country: str
 @app.get("/")
 async def home2():
     return {"Hello":"World"}
@@ -65,3 +68,14 @@ async def show_person_by_id(
     person_id: int = Path(...,ge=1)
     ):
     return {person_id: "exists"}
+@app.put("/person/{person_id}")
+async def update_person(
+    person_id: int = Path
+    (..., gt=0, title="Here you put the id of the person",description="The id of the person must be greater than 0"),
+    person: Person = Body(...),
+    location: Location = Body(...)):
+    persona = {**dict(person),**dict(location)}
+    return {
+        "user_id":person_id,
+        "user_info":persona
+        }
