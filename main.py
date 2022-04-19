@@ -1,6 +1,20 @@
+#Python
+from typing import Optional
+#Pydantic
+from pydantic import BaseModel
+#FASTAPI
 from fastapi import FastAPI
+from fastapi import Body
 #Contiene toda la aplicación
 app = FastAPI()
+
+#Creamos un modelo
+class Person(BaseModel):
+    first_name: str
+    last_name: str
+    age: int
+    hair_color: Optional[str] = None
+    is_single: Optional[bool] = None
 
 @app.get("/")
 async def home2():
@@ -9,17 +23,8 @@ async def home2():
 @app.get("/{user}")
 async def home(user):
     return {"response":f"hello {user}"}
-"""
- Para correr el programa es necesario hacer uso del comando
- uvicorn main:app --reload 
- El parametro --reload sirve para recargar el sitio en caso de
- que se haga un cambio en el archivo se recarge la ejecución de la
- API
-"""
-"""
-Con la ruta http://{url}/docs
-ejemplo
-http://localhost:8000/docs
-Muestra la documentancion de la API
-Lo mismo se puede hacer con redoc
-"""
+
+#Los tres puntos significa que el parametro es obligatorio
+@app.post("/person/new")
+async def create_person(person: Person = Body(...)):
+    return person
