@@ -8,7 +8,7 @@ from pydantic import EmailStr
 #Esta clase nos sirve para agregar validaciones a un cuerpo
 from pydantic import Field
 #FASTAPI
-from fastapi import FastAPI, Query, Body, Path
+from fastapi import FastAPI, Query, Body, Path, status
 #Contiene toda la aplicación
 app = FastAPI()
 
@@ -82,7 +82,17 @@ class Location(BaseModel):
                 "country":"Mexico"
             }
         }
-@app.get("/")
+        
+"""
+Con el framework FASTAPI, disponemos del objeto status
+En el podemos indicarle el codigo de estatus de la petición desde nuestro
+path function decorator de manera personalizada. Por defecto dependiendo del
+VERBO HTTP, coloca el codigo adecuado, sin embargo con esto podemos personalizarlo
+"""
+@app.get(
+    path="/",
+    status_code=status.HTTP_200_OK
+    )
 async def home2():
     return {"Hello":"World"}
 """
