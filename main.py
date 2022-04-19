@@ -3,6 +3,7 @@ from typing import Optional
 from enum import Enum
 #Pydantic
 from pydantic import BaseModel
+from pydantic import EmailStr
 #Esta clase nos sirve para agregar validaciones a un cuerpo
 from pydantic import Field
 #FASTAPI
@@ -38,6 +39,7 @@ class Person(BaseModel):
     is_single: Optional[bool] = Field(
         default=True
     )
+    email : Optional[EmailStr] = Field(default=None)
 class Location(BaseModel):
     city: str
     state: str
