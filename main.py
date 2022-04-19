@@ -22,9 +22,6 @@ class HairColor(Enum):
     black = "black"
 
 #Creamos un modelo
-class User(BaseModel):
-    email: EmailStr
-    password : str = Field(..., min_length=8)
 class Person(BaseModel):
     first_name: str = Field(...,
                             min_length=1,
@@ -54,6 +51,25 @@ class Person(BaseModel):
                 "is_single":True
             }
         }
+"""
+Con este modelo creamos un objeto de respuesta
+"""
+class PersonOut(BaseModel):
+    first_name: str = Field(...,
+                            min_length=1,
+                            max_length=50)
+    last_name: str = Field(...,
+                            min_length=1,
+                            max_length=50)
+    age: int = Field(
+        ...,
+        gt=0,
+        lt=100
+        )
+    city: str
+    state: str
+    country: str
+
 class Location(BaseModel):
     city: str
     state: str
@@ -123,14 +139,12 @@ async def show_person_by_id(
     person_id: int = Path(...,ge=1)
     ):
     return {person_id: "exists"}
-@app.put("/person/{person_id}")
+@app.put("/person/{person_id}", response_model=PersonOut)
 async def update_person(
     person_id: int = Path
     (..., gt=0, title="Here you put the id of the person",description="The id of the person must be greater than 0",example=777),
     person: Person = Body(...),
     location: Location = Body(...)):
-    persona = {**dict(person),**dict(location)}
-    return {
-        "user_id":person_id,
-        "user_info":persona
-        }
+    data = {**dict(person),**dict(location)}
+    data["adicional"] = "jajajas"
+    return data
