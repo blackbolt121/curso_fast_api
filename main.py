@@ -1,4 +1,5 @@
 #Python
+from pickle import TRUE
 from typing import Optional
 from enum import Enum
 #Pydantic
@@ -21,6 +22,9 @@ class HairColor(Enum):
     black = "black"
 
 #Creamos un modelo
+class User(BaseModel):
+    email: EmailStr
+    password : str = Field(..., min_length=8)
 class Person(BaseModel):
     first_name: str = Field(...,
                             min_length=1,
@@ -40,17 +44,38 @@ class Person(BaseModel):
         default=True
     )
     email : Optional[EmailStr] = Field(default=None)
+    class Config:
+        schema_extra = {
+            "example":{
+                "first_name":"Rodrigo",
+                "last_name": "Lopez",
+                "age": 21,
+                "hair_color":"black",
+                "is_single":True
+            }
+        }
 class Location(BaseModel):
     city: str
     state: str
     country: str
+    class config:
+        schema_extra ={
+            "example": {
+                "city":"Corregidora",
+                "state":"Queretaro",
+                "country":"Mexico"
+            }
+        }
 @app.get("/")
 async def home2():
     return {"Hello":"World"}
-
-@app.get("/hello/{user}")
-async def home(user):
-    return {"response":f"hello {user}"}
+"""
+Tanto para path y query existe la opción de agregar ejemplos, y en la misma
+documentación de la api (docs), aparecera el valor puesto de ejemplo
+"""
+@app.get("/hello_world/{user}")
+async def home(user: str = Path(...,min_length=1,example="World")):
+    return {"hello":f"{user}"}
 #Los tres puntos significa que el parametro es obligatorio
 @app.post("/person/new")
 async def create_person(person: Person = Body(...)):
@@ -63,11 +88,13 @@ async def show_person(
      min_length=1,
      max_length=50,
      title="Person Name",
-     description="This is the person name. It's between 1 and 50 characters"),
+     description="This is the person name. It's between 1 and 50 characters",
+     example="Jose"),
     age: str = Query(
         ...,
         title="Person age",
-        description="This is the person age. It's required"
+        description="This is the person age. It's required",
+        example=14
         )
 ):
     return {name:age}
@@ -78,14 +105,16 @@ async def saludar(
         min_length=2,
         max_length=50,
         title="This is the name of the preson",
-        description="it's name length must be between 2 and 50 characters"
+        description="it's name length must be between 2 and 50 characters",
+        example="Javier"
         ),
     edad: Optional[int] = Query(
         20,
         le=100,
         gt=1,
         title="Age parameter",
-        description="Here you put the age of the person, it must be between 1 and 100"
+        description="Here you put the age of the person, it must be between 1 and 100",
+        example=10
         )
 ):
     return {"saludo":f"Hola {name}, tines {edad}"}
@@ -97,7 +126,7 @@ async def show_person_by_id(
 @app.put("/person/{person_id}")
 async def update_person(
     person_id: int = Path
-    (..., gt=0, title="Here you put the id of the person",description="The id of the person must be greater than 0"),
+    (..., gt=0, title="Here you put the id of the person",description="The id of the person must be greater than 0",example=777),
     person: Person = Body(...),
     location: Location = Body(...)):
     persona = {**dict(person),**dict(location)}
