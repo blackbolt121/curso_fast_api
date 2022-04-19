@@ -19,10 +19,9 @@ class Person(BaseModel):
 async def home2():
     return {"Hello":"World"}
 
-@app.get("/{user}")
+@app.get("/hello/{user}")
 async def home(user):
     return {"response":f"hello {user}"}
-
 #Los tres puntos significa que el parametro es obligatorio
 @app.post("/person/new")
 async def create_person(person: Person = Body(...)):
@@ -35,3 +34,9 @@ async def show_person(
 
 ):
     return {name:age}
+@app.get("/saludar")
+async def saludar(
+    name: str = Query(...,min_length=2,max_length=50),
+    edad: Optional[int] = Query(20,le=100, gt=1)
+):
+    return {"saludo":f"Hola {name}, tines {edad}"}
