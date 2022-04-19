@@ -1,19 +1,43 @@
 #Python
 from typing import Optional
+from enum import Enum
 #Pydantic
 from pydantic import BaseModel
+#Esta clase nos sirve para agregar validaciones a un cuerpo
+from pydantic import Field
 #FASTAPI
 from fastapi import FastAPI, Query, Body, Path
 #Contiene toda la aplicación
 app = FastAPI()
 
+#Enums
+#Definimos un enum para limitar el tipo de string que puede recibir nuestra clase
+class HairColor(Enum):
+    white = "white"
+    red = "red"
+    brown = "brown"
+    blonde = "blonde"
+    black = "black"
+
 #Creamos un modelo
 class Person(BaseModel):
-    first_name: str
-    last_name: str
-    age: int
-    hair_color: Optional[str] = None
-    is_single: Optional[bool] = None
+    first_name: str = Field(...,
+                            min_length=1,
+                            max_length=50)
+    last_name: str = Field(...,
+                            min_length=1,
+                            max_length=50)
+    age: int = Field(
+        ...,
+        gt=0,
+        lt=100
+        )
+    hair_color: Optional[HairColor] = Field(
+        default=None
+    )
+    is_single: Optional[bool] = Field(
+        default=True
+    )
 class Location(BaseModel):
     city: str
     state: str
