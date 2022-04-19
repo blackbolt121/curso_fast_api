@@ -31,3 +31,28 @@ Se importa desde la libreria typing
 ##Consulta más documentación aquí
 >1.https://www.markdownguide.org/basic-syntax/
 >2.https://hackmd.io/@duvanbotello/rk8vjxCrt
+
+##Validaciones con Query
+Con Query podemos agregar parametros en la URL de nuestra API
+Para las validaciones al menos hay para string e integers, además podemos definir si son obligatorios o no pasando dentro del constructor los ... (obligatorio),
+o None o valor predeterminado (No obligatorio)
+
+>#Ejemplo
+>`
+>   @app.get("/saludar")
+>   def saludar(
+>    nombre: string=Query(...),
+>    edad: Optional[int] = Query(20)
+>    )
+>   
+>`
+Adicionalmente dentro de los Query podemos agregar parametros para filtrar, entre esos parametros son
+###Cadenas
+-max_length: Defines el tamaño maximo
+-min_length: ..... mínimo
+-regex: Defines el tipo de cadena por una expresion regular
+###Numerico
+-ge: Condición para que el numero no sea mayor o igual
+-le: Condición para que el numero no sea menor o igual
+-gt: Condición para que el numero no sea extrictamente mayor
+-lt: Condicion para que el numero no sea extrictamente menor
