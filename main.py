@@ -1,14 +1,14 @@
 #Python
-from pickle import TRUE
+from os import stat
 from typing import Optional
 from enum import Enum
+from hashlib import md5
 #Pydantic
-from pydantic import BaseModel
-from pydantic import EmailStr
+from pydantic import BaseModel, ValidationError, EmailStr
 #Esta clase nos sirve para agregar validaciones a un cuerpo
 from pydantic import Field
 #FASTAPI
-from fastapi import FastAPI, Query, Body, Path, status
+from fastapi import FastAPI, Query, Body, Path, status, Form, HTTPException
 #Contiene toda la aplicación
 app = FastAPI()
 
@@ -55,6 +55,7 @@ class Person(BaseModel):
 Con este modelo creamos un objeto de respuesta
 """
 class PersonOut(BaseModel):
+    person_id: int = Field(...,gt=1)
     first_name: str = Field(...,
                             min_length=1,
                             max_length=50)
@@ -82,7 +83,17 @@ class Location(BaseModel):
                 "country":"Mexico"
             }
         }
-        
+
+class User(BaseModel):
+    email: EmailStr = Field(...,example="rgo1999@hotmail.com")
+    password: str = Field(...,min_length=1)
+    class config:
+        schema_extra={
+            "example":{
+                "email":"email@example.com",
+                "password":"super_pa$$word"
+            }
+        }      
 """
 Con el framework FASTAPI, disponemos del objeto status
 En el podemos indicarle el codigo de estatus de la petición desde nuestro
@@ -156,5 +167,25 @@ async def update_person(
     person: Person = Body(...),
     location: Location = Body(...)):
     data = {**dict(person),**dict(location)}
+    data["person_id"] = person_id
     data["adicional"] = "jajajas"
     return data
+
+@app.post(
+    path="/login",
+    status_code=status.HTTP_200_OK,
+    response_model=User,
+    response_model_exclude=("password",)
+    )
+def login(
+    _email: EmailStr = Form(...,
+                       example="hello@world.com"
+                       ), 
+    _password: str = Form(...,
+                          min_length=8,
+                          example="supa_p4$$w0rd"
+                          )
+    ):
+    log = User(email=_email,password=_password)
+    print(_password)
+    return log 
